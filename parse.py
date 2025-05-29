@@ -23,10 +23,10 @@ def get_arg_parser():
     # Radar Intrinsics
     intrinsics_radar = {
         "opening_h": 1.8,
-        "opening_v": 40.0,
+        "opening_v": 1.8,
         "num_azimuths_radar": 400,
-        "num_range_bins": 7536,
-        "bin_size_radar": 0.044,
+        "num_range_bins": 2857,
+        "bin_size_radar": 0.175,
         #"mounting_height": 1.62
     }
     parser.add_argument("--intrinsics_radar", type=yaml.safe_load, default=intrinsics_radar)
