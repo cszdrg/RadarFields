@@ -48,10 +48,11 @@ def train(args, model, criterion):
                                 **args.intrinsics_radar
                                 ).dataloader(args.bs)
     print("Train dataloader prepared.")
+    print("len(dataset) =", len(train_loader.dataset))
 
     # Tracking sensor poses
-    args.all_poses = train_loader._data.poses_radar.to(args.device)
-    args.test_indices = train_loader._data.preprocess["test_indices"]
+    # args.all_poses = train_loader._data.poses_radar.to(args.device)
+    # args.test_indices = train_loader._data.preprocess["test_indices"]
 
     trainer = Trainer(args, model, split="train", criterion=criterion,
                       optimizer=optimizer, lr_scheduler=scheduler, device=args.device)

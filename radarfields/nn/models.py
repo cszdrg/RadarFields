@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import tinycudann as tcnn
+# import tinycudann as tcnn
 import numpy as np
 
 from radarfields.nn.encoding import PositionalEncoding
@@ -77,34 +77,34 @@ class RadarField(nn.Module):
         self.sigmoid_tightness = sigmoid_tightness
         self.softplus = nn.Softplus()
 
-        if self.tcnn: # Instantiating network w TCNN
+        # if self.tcnn: # Instantiating network w TCNN
 
-            if angle_encoding == "HashGrid": raise ValueError("ERROR: angle_encoding cannot be HashGrid.")
+        #     if angle_encoding == "HashGrid": raise ValueError("ERROR: angle_encoding cannot be HashGrid.")
 
-            # TCNN configs
-            self.encode_xyz_config = get_encoding_config(xyz_encoding, resolution, bound,
-                                                         n_bands=num_bands_xyz, n_levels=n_levels)
-            self.encode_angle_config = get_encoding_config(angle_encoding, None, None)
-            self.xyz_net_config = get_mlp_config(hidden_dim, angle_in_layer - 1)
-            self.alpha_net_config = get_mlp_config(hidden_dim, num_layers - angle_in_layer + 1)
-            self.rd_net_config = get_mlp_config(hidden_dim, num_layers - angle_in_layer + 1)
+        #     # TCNN configs
+        #     self.encode_xyz_config = get_encoding_config(xyz_encoding, resolution, bound,
+        #                                                  n_bands=num_bands_xyz, n_levels=n_levels)
+        #     self.encode_angle_config = get_encoding_config(angle_encoding, None, None)
+        #     self.xyz_net_config = get_mlp_config(hidden_dim, angle_in_layer - 1)
+        #     self.alpha_net_config = get_mlp_config(hidden_dim, num_layers - angle_in_layer + 1)
+        #     self.rd_net_config = get_mlp_config(hidden_dim, num_layers - angle_in_layer + 1)
             
-            # Encodings & NNs
-            self.encode_xyz = tcnn.Encoding(n_input_dims=in_dim, encoding_config=self.encode_xyz_config)
-            self.encode_angle = tcnn.Encoding(n_input_dims=angle_dim, encoding_config=self.encode_angle_config)
-            self.xyz_net = tcnn.Network(n_input_dims=self.encode_xyz.n_output_dims,
-                                        n_output_dims=xyz_feat_dim,
-                                        network_config=self.xyz_net_config)
-            self.alpha_net = tcnn.Network(n_input_dims=xyz_feat_dim,
-                                          n_output_dims=alpha_dim,
-                                          network_config=self.alpha_net_config)
-            self.rd_net = tcnn.Network(n_input_dims=self.encode_angle.n_output_dims + xyz_feat_dim,
-                                        n_output_dims=rd_dim,
-                                        network_config=self.rd_net_config)
+        #     # Encodings & NNs
+        #     self.encode_xyz = tcnn.Encoding(n_input_dims=in_dim, encoding_config=self.encode_xyz_config)
+        #     self.encode_angle = tcnn.Encoding(n_input_dims=angle_dim, encoding_config=self.encode_angle_config)
+        #     self.xyz_net = tcnn.Network(n_input_dims=self.encode_xyz.n_output_dims,
+        #                                 n_output_dims=xyz_feat_dim,
+        #                                 network_config=self.xyz_net_config)
+        #     self.alpha_net = tcnn.Network(n_input_dims=xyz_feat_dim,
+        #                                   n_output_dims=alpha_dim,
+        #                                   network_config=self.alpha_net_config)
+        #     self.rd_net = tcnn.Network(n_input_dims=self.encode_angle.n_output_dims + xyz_feat_dim,
+        #                                 n_output_dims=rd_dim,
+        #                                 network_config=self.rd_net_config)
 
-            if bn: self.xyz_net = nn.Sequential(self.xyz_net, nn.BatchNorm1d(xyz_feat_dim))
+        #     if bn: self.xyz_net = nn.Sequential(self.xyz_net, nn.BatchNorm1d(xyz_feat_dim))
 
-            return
+        #     return
 
         # Encodings & NNs **without TCNN**
         self.encode_xyz = PositionalEncoding(in_dim, b=num_bands_xyz)

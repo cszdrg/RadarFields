@@ -73,8 +73,8 @@ for frame_id, timestamp in frames:
     new_path = os.path.join(FFTPath, new_filename)
     os.rename(old_path, new_path)
 
-offset = 0
-scalers = 100
+offsets = [0, 0, 0]
+scalers = [100, 100, 100]
 
 data = {
     "train_indices": train_indices,

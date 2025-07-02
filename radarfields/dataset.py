@@ -34,7 +34,7 @@ class RadarDataset:
 
     # optional settings
     sample_all_ranges: bool = False
-    train_thresholded: bool = True
+    train_thresholded: bool = False
     reg_occ: bool = True
     additive: bool = False
     preload: bool = False
@@ -86,7 +86,7 @@ class RadarDataset:
                 self.fft_frames.append(thresholded_fft)
         else: # Train on unprocessed FFT data
             for fft_frame in tqdm.tqdm(fft_frames, desc=f"Loading FFT data"):
-                raw_radar_fft = read_fft_image(fft_path / fft_frame)
+                raw_radar_fft = read_fft_image(fft_path / (str(fft_frame) + '.png'))
                 self.fft_frames.append(raw_radar_fft)
 
         # Occupancy components (for regularizing occupancy)
@@ -104,13 +104,15 @@ class RadarDataset:
             self.sample_all_ranges = True
         if (self.max_range_bin-self.min_range_bin+1) ==self.num_range_samples: self.sample_all_ranges = True
         
-        # Radiation pattern look-up table (LUT) for integrating beam samples
-        elevation_LUT_path = (self.project_root / self.data_path).parent / "elevation.csv"
-        azimuth_LUT_path = (self.project_root / self.data_path).parent / "azimuth.csv"
-        print(f"loading elevation radiation pattern from {elevation_LUT_path}")
-        self.elevation_LUT_linear = read_LUT(elevation_LUT_path)
-        print(f"loading azimuth radiation pattern from {azimuth_LUT_path}")
-        self.azimuth_LUT_linear = read_LUT(azimuth_LUT_path)
+        # # Radiation pattern look-up table (LUT) for integrating beam samples
+        # elevation_LUT_path = (self.project_root / self.data_path).parent / "elevation.csv"
+        # azimuth_LUT_path = (self.project_root / self.data_path).parent / "azimuth.csv"
+        # print(f"loading elevation radiation pattern from {elevation_LUT_path}")
+        # self.elevation_LUT_linear = read_LUT(elevation_LUT_path)
+        # print(f"loading azimuth radiation pattern from {azimuth_LUT_path}")
+        # self.azimuth_LUT_linear = read_LUT(azimuth_LUT_path)
+        self.azimuth_LUT_linear = None
+        self.elevation_LUT_linear = None
 
         # Converting to torch
         self.poses_radar = torch.from_numpy(np.stack(self.poses_radar, axis=0)) # [B, 4, 4]
@@ -122,6 +124,10 @@ class RadarDataset:
             self.poses_radar = self.poses_radar.to(self.device)
             self.fft_frames = self.fft_frames.to(self.device)
             if self.reg_occ: self.occ_frames = self.occ_frames.to(self.device)
+    
+    def __getitem__(self, idx):
+        print(f"Accessing index: {idx}")
+        return self.data[idx]
 
     def collate(self, index):
         '''
