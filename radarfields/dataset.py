@@ -62,6 +62,8 @@ class RadarDataset:
 
         # Sampler
         self.indices = preprocess[self.split + '_indices']
+        for i in range(len(self.indices)):
+            self.indices[i] -= 1
         self.sampler = SubsetRandomSampler(self.indices)
 
         # Offsets and Scalers to normalize XYZ model queries

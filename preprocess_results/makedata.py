@@ -74,7 +74,7 @@ for frame_id, timestamp in frames:
     os.rename(old_path, new_path)
 
 offsets = [0, 0, 0]
-scalers = [100, 100, 100]
+scalers = [1, 1, 1]
 
 data = {
     "train_indices": train_indices,
