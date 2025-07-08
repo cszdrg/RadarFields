@@ -12,7 +12,7 @@ def read_fft_image(fft_path, numpy=False):
 
     # Remove metadata
     fft_img = np.asarray(fft_img)
-    fft_img = fft_img[11:, :]
+    # fft_img = fft_img[11:, :]
 
     if numpy: return fft_img.T
 

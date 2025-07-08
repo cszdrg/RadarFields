@@ -27,8 +27,8 @@ class RadarDataset:
     num_rays_radar: int = 200
     num_fov_samples: int = 10
     min_range_bin: int = 1 # NOTE: inclusive
-    max_range_bin: int = 1200 # NOTE: also inclusive
-    num_range_samples: int = 1199
+    max_range_bin: int = 500 # NOTE: also inclusive
+    num_range_samples: int = 500
     integrate_rays: bool = True
     bs: int = 10
 
@@ -41,11 +41,11 @@ class RadarDataset:
     square_gain: bool = True
 
     # radar intrinsics
-    num_range_bins: int = 7536
-    bin_size_radar: float = 0.044
+    num_range_bins: int = 576
+    bin_size_radar: float = 0.175
     num_azimuths_radar: int = 400
     opening_h: float = 1.8
-    opening_v: float = 40.0
+    opening_v: float = 1.8
 
     def __post_init__(self):
         self.training = self.split == "train"

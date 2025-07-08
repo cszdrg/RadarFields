@@ -27,10 +27,10 @@ def makepose(imu_orientation_x,
     T[:3, :3] = rotation_matrix  # 上左角放旋转矩阵 R
     T[:3, 3] = translation 
     
-    return T
+    return T, x, y, z
 
 frames = []
-with open("RadarFields/pre/Navtech_Polar.txt", "r", encoding="utf-8") as f:
+with open("preprocess_results/Navtech_Polar.txt", "r", encoding="utf-8") as f:
     for line in f:
         line = line.strip()
         if not line:
@@ -46,8 +46,11 @@ train_indices = []
 radar2worlds = []
 timestamps_radar = []
 # 根据帧名获取位姿矩阵 生成数据
-BasePath = "RadarFields/pre/GPS_IMU_Twist"
-FFTPath = "RadarFields/pre/Navtech_Polar"
+BasePath = "preprocess_results/GPS_IMU_Twist"
+FFTPath = "preprocess_results/Navtech_Polar"
+xx = []
+yy = []
+zz = []
 for frame_id, timestamp in frames:
     PosePath = f"{BasePath}/{frame_id:06d}.txt"
     with open(PosePath, 'r', encoding='utf-8') as f:
@@ -61,30 +64,34 @@ for frame_id, timestamp in frames:
             if i == 4:
                 imu_orientation_x, imu_orientation_y, imu_orientation_z, imu_orientation_w = float(parts[0]), float(parts[1]), float(parts[2]), float(parts[3])
             i = i + 1
-    T = makepose(imu_orientation_x, imu_orientation_y, imu_orientation_z, imu_orientation_w, lon, lat, alt)
+    T, x, y, z = makepose(imu_orientation_x, imu_orientation_y, imu_orientation_z, imu_orientation_w, lon, lat, alt)
+    xx.append(x)
+    yy.append(y)
+    zz.append(z)
     train_indices.append(frame_id)
     radar2worlds.append(T.tolist())
     timestamps_radar.append(timestamp)
     
-    # 修改雷达文件名称为时间戳
-    filename = f"{frame_id:06d}.png"
-    old_path = os.path.join(FFTPath, filename)
-    new_filename = str(timestamp) + '.png'
-    new_path = os.path.join(FFTPath, new_filename)
-    os.rename(old_path, new_path)
-
-offsets = [0, 0, 0]
-scalers = [1, 1, 1]
+    # # 修改雷达文件名称为时间戳
+    # filename = f"{frame_id:06d}.png"
+    # old_path = os.path.join(FFTPath, filename)
+    # new_filename = str(timestamp) + '.png'
+    # new_path = os.path.join(FFTPath, new_filename)
+    # os.rename(old_path, new_path)
+offsets = [-np.mean(xx), -np.mean(yy), -np.mean(zz)]
+scalers = [np.std(xx), np.std(yy), np.std(zz)]
+print("offset = ", offsets)
+print("scalers = ", scalers)
 
 data = {
     "train_indices": train_indices,
     "radar2worlds": radar2worlds,
     "timestamps_radar": timestamps_radar,
-    "offset": offset,
+    "offsets": offsets,
     "scalers": scalers
 }
 
-with open('data.json', 'w', encoding='utf-8') as f:
+with open('preprocess_results/preprocess_results.json', 'w', encoding='utf-8') as f:
     json.dump(data, f, indent=2)
 
 print("done")
