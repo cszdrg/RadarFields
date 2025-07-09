@@ -61,5 +61,5 @@ pose_lr = 0.0009
 schedule_pose = False
 demo = False
 demo_name = None
-data_path = C:\Users\11817\Desktop\±œ“µ…Ëº∆\RadarFields\data\seq10
+data_path = /root/RadarFields/data/seq10
 device = cuda

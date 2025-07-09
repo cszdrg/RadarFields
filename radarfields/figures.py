@@ -5,6 +5,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 from utils.vis import arrays_to_gif
 from utils.train import get_rotation_matrix
@@ -172,12 +173,15 @@ def render_outputs_supersampled(trainer, data, points, bin_ranges, fig_path, tim
         fft_img_path = fig_path / "pred_FFT"
         fft_img_path.mkdir(exist_ok=True)
         fft_img_path = fft_img_path / timestamp
+        fft_img_path = Path(fft_img_path).with_suffix(".png")
         alpha_img_path = fig_path / "pred_occupancy"
         alpha_img_path.mkdir(exist_ok=True)
         alpha_img_path = alpha_img_path / timestamp
+        alpha_img_path = Path(alpha_img_path).with_suffix(".png")
         rd_img_path = fig_path / "pred_reflectance"
         rd_img_path.mkdir(exist_ok=True)
         rd_img_path = rd_img_path / timestamp
+        rd_img_path = Path(rd_img_path).with_suffix(".png")
 
         # Predicted FFT
         fft_img = fft_img.clone().detach().cpu().numpy()
