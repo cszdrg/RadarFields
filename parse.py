@@ -103,9 +103,9 @@ def get_arg_parser():
 
     # Visualization/Figure Settings
     parser.add_argument("--render_fft", action="store_true", help="toggle rendering FFT data")
-    parser.add_argument("--figure_resolution", type=int, default=781, help="resolution for figures")
+    parser.add_argument("--figure_resolution", type=int, default=1152, help="resolution for figures")
     parser.add_argument("--save_loss_plot", action="store_true", help="periodically save loss plots")
-    parser.add_argument("--max_test_bin", type=int, default=800, help="max bin at which to render outputs")
+    parser.add_argument("--max_test_bin", type=int, default=500, help="max bin at which to render outputs")
 
     # Learned Pose Refinement
     parser.add_argument("--refine_poses", action="store_true", help="toggle learned pose refinement")

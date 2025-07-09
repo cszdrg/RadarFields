@@ -41,8 +41,10 @@ with open("preprocess_results/Navtech_Polar.txt", "r", encoding="utf-8") as f:
         timestamp = float(parts[3])  # 时间戳字符串 → float
 
         frames.append((frame_id, timestamp))
-
+# 700个训练
 train_indices = []
+# 17个测试
+test_indices = []
 radar2worlds = []
 timestamps_radar = []
 # 根据帧名获取位姿矩阵 生成数据
@@ -51,6 +53,7 @@ FFTPath = "preprocess_results/Navtech_Polar"
 xx = []
 yy = []
 zz = []
+index = 0
 for frame_id, timestamp in frames:
     PosePath = f"{BasePath}/{frame_id:06d}.txt"
     with open(PosePath, 'r', encoding='utf-8') as f:
@@ -68,7 +71,11 @@ for frame_id, timestamp in frames:
     xx.append(x)
     yy.append(y)
     zz.append(z)
-    train_indices.append(frame_id)
+    index += 1
+    if index > 700:
+        test_indices.append(frame_id)
+    else:
+        train_indices.append(frame_id)
     radar2worlds.append(T.tolist())
     timestamps_radar.append(timestamp)
     
@@ -84,6 +91,7 @@ print("offset = ", offsets)
 print("scalers = ", scalers)
 
 data = {
+    "test_indices": test_indices,
     "train_indices": train_indices,
     "radar2worlds": radar2worlds,
     "timestamps_radar": timestamps_radar,

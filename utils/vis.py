@@ -86,6 +86,7 @@ def render_FFT(fft_img, num_bins_to_show, bin_size, num_azims, path,
 
     if save:
         render = Image.fromarray((render*255).astype(np.uint8))
+        path = path.with_suffix('.png')
         render.save(path, compress_level=0)
     if plot:
         plt.imshow(render)
@@ -98,7 +99,7 @@ def render_FFT_batch(fft_imgs, num_bins_to_show, bin_size, num_azims, path, time
     min_bin = min_range_bin-1 # converting from 1-indexed to 0-indexed
     B, height, width_og = fft_imgs.shape
     width = width_og + min_bin
-    assert(num_bins_to_show < width)
+    assert(num_bins_to_show <= width)
 
     for b in range(B):
         fpath = path / str(timestamps[b])

@@ -22,7 +22,8 @@ def test(args, model, criterion):
     test_loader = RadarDataset(split="test",
                                 **filter_dict_for_dataclass(RadarDataset, vars(copy.deepcopy(args))),
                                 **args.intrinsics_radar
-                                ).dataloader(args.bs)
+                                # ).dataloader(args.bs)
+                                ).dataloader(1)
     print("Test dataloader prepared.")
 
     # Tracking sensor poses
