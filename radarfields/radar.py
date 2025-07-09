@@ -16,8 +16,17 @@ def avg_rays(samples, num_samples):
     '''## Average a batch of super-sampled rays with S=num_samples super-samples per ray.'''
     if num_samples == 1: return torch.squeeze(samples, dim=-1) # No super-sampling; return
     
-    B, NS, R, F = samples.shape
-    S = num_samples
+       
+    if samples.dim() == 2:
+        B = 1
+        F = 3
+        S = num_samples
+        R = math.sqrt(samples.shape[0] / S)
+        N = R
+        S = R
+    else:
+        B, NS, R, F = samples.shape
+        S = num_samples 
 
     samples_reshaped = samples.reshape((B, -1, S, R, F)) # [B, N, S, R, 1]
     ray_sums = torch.sum(samples_reshaped, dim=2) # [B, N, R, 1]
