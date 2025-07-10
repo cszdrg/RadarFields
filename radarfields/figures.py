@@ -245,12 +245,12 @@ def render_outputs_over_depth(trainer, data, points, bin_ranges, fig_path, times
     radar = radar.reshape((-1, 3)) # [Z*(R**2), 3]
     dists = dists.reshape((num_z_levels*(resolution**2)))# [Z*(R**2)]
 
-    # Elevation radiation profile of sensor
-    elev_LUT = data["elev_LUT"]
-    elev_weights = np.interp(elev_angles, elev_LUT[:,0], elev_LUT[:,1])
-    elev_weights = torch.from_numpy(elev_weights).type(torch.float32).to(trainer.device) # [Z*(R**2)]
-    elev_weights = elev_weights.reshape((num_z_levels, resolution, resolution)) # [Z, R, R]
-    total_weights_per_bin = torch.sum(elev_weights, dim=0) # [R, R]
+    # # Elevation radiation profile of sensor
+    # elev_LUT = data["elev_LUT"]
+    # elev_weights = np.interp(elev_angles, elev_LUT[:,0], elev_LUT[:,1])
+    # elev_weights = torch.from_numpy(elev_weights).type(torch.float32).to(trainer.device) # [Z*(R**2)]
+    # elev_weights = elev_weights.reshape((num_z_levels, resolution, resolution)) # [Z, R, R]
+    # total_weights_per_bin = torch.sum(elev_weights, dim=0) # [R, R]
 
     # Masking out pixels that correspond to bins outside of the given bin range
     mask = torch.logical_and(dists >= min_radial_distance, dists <= max_radial_distance)# [Z*(R**2)]
@@ -300,53 +300,55 @@ def render_outputs_over_depth(trainer, data, points, bin_ranges, fig_path, times
         rd_imgs = rd_imgs.reshape((num_z_levels, resolution, resolution))
 
         # Integrating across elevation slices using sensor elevation profile
-        alpha_integrated = torch.sum(alpha_imgs*elev_weights, dim=0)/total_weights_per_bin # [R, R]
-        rd_integrated = torch.sum(rd_imgs*elev_weights, dim=0)/total_weights_per_bin # [R, R]
+        # alpha_integrated = torch.sum(alpha_imgs*elev_weights, dim=0)/total_weights_per_bin # [R, R]
+        # rd_integrated = torch.sum(rd_imgs*elev_weights, dim=0)/total_weights_per_bin # [R, R]
 
         # Taking z-wise mean intensity per x-y position
         alpha_mean = torch.mean(alpha_imgs, dim=0) # [R, R]
         rd_mean = torch.mean(rd_imgs, dim=0) # [R, R]
 
         # Normalizing
-        alpha_integrated = alpha_integrated - torch.min(alpha_integrated[mask[0,...]])
-        alpha_integrated = alpha_integrated / torch.max(alpha_integrated[mask[0,...]])
-        rd_integrated = rd_integrated - torch.min(rd_integrated[mask[0,...]])
-        rd_integrated = rd_integrated / torch.max(rd_integrated[mask[0,...]])
+        # alpha_integrated = alpha_integrated - torch.min(alpha_integrated[mask[0,...]])
+        # alpha_integrated = alpha_integrated / torch.max(alpha_integrated[mask[0,...]])
+        # rd_integrated = rd_integrated - torch.min(rd_integrated[mask[0,...]])
+        # rd_integrated = rd_integrated / torch.max(rd_integrated[mask[0,...]])
         alpha_mean = alpha_mean - torch.min(alpha_mean[mask[0,...]])
         alpha_mean = alpha_mean / torch.max(alpha_mean[mask[0,...]])
         rd_mean = rd_mean - torch.min(rd_mean[mask[0,...]])
         rd_mean = rd_mean / torch.max(rd_mean[mask[0,...]])
 
         # Applying mask & clipping
-        alpha_integrated = torch.clip(alpha_integrated*mask[0,...], 0.0, 1.0)
-        rd_integrated = torch.clip(rd_integrated*mask[0,...], 0.0, 1.0)
+        # alpha_integrated = torch.clip(alpha_integrated*mask[0,...], 0.0, 1.0)
+        # rd_integrated = torch.clip(rd_integrated*mask[0,...], 0.0, 1.0)
         alpha_mean = torch.clip(alpha_mean*mask[0,...], 0.0, 1.0)
         rd_mean = torch.clip(rd_mean*mask[0,...], 0.0, 1.0)
 
-        alpha_img_path = fig_path / "integrated_occupancy"
-        alpha_img_path.mkdir(exist_ok=True)
-        alpha_img_path = alpha_img_path / timestamp
-        rd_img_path = fig_path / "integrated_reflectance"
-        rd_img_path.mkdir(exist_ok=True)
-        rd_img_path = rd_img_path / timestamp
+        # alpha_img_path = fig_path / "integrated_occupancy"
+        # alpha_img_path.mkdir(exist_ok=True)
+        # alpha_img_path = alpha_img_path / timestamp
+        # rd_img_path = fig_path / "integrated_reflectance"
+        # rd_img_path.mkdir(exist_ok=True)
+        # rd_img_path = rd_img_path / timestamp
         alpha_mean_img_path = fig_path / "mean_occupancy"
         alpha_mean_img_path.mkdir(exist_ok=True)
         alpha_mean_img_path = alpha_mean_img_path / timestamp
+        alpha_mean_img_path = Path(alpha_mean_img_path).with_suffix(".png")
         rd_mean_img_path = fig_path / "mean_reflectance"
         rd_mean_img_path.mkdir(exist_ok=True)
         rd_mean_img_path = rd_mean_img_path / timestamp
+        rd_mean_img_path = Path(rd_mean_img_path).with_suffix(".png")
 
         # Integrated occupancy
-        alpha_integrated = cm(alpha_integrated.detach().cpu().numpy())
-        alpha_integrated[white_mask[0,...]] = 1.0
-        alpha_integrated = Image.fromarray((alpha_integrated[:,:,:3]*255).astype(np.uint8))
-        alpha_integrated.save(alpha_img_path, compress_level=0)
+        # alpha_integrated = cm(alpha_integrated.detach().cpu().numpy())
+        # alpha_integrated[white_mask[0,...]] = 1.0
+        # alpha_integrated = Image.fromarray((alpha_integrated[:,:,:3]*255).astype(np.uint8))
+        # alpha_integrated.save(alpha_img_path, compress_level=0)
 
         # Integrated reflectance
-        rd_integrated = cm_rd(rd_integrated.detach().cpu().numpy())
-        rd_integrated[white_mask[0,...]] = 1.0
-        rd_integrated = Image.fromarray((rd_integrated[:,:,:3]*255).astype(np.uint8))
-        rd_integrated.save(rd_img_path, compress_level=0)
+        # rd_integrated = cm_rd(rd_integrated.detach().cpu().numpy())
+        # rd_integrated[white_mask[0,...]] = 1.0
+        # rd_integrated = Image.fromarray((rd_integrated[:,:,:3]*255).astype(np.uint8))
+        # rd_integrated.save(rd_img_path, compress_level=0)
 
         # Averaged occupancy
         alpha_mean = cm(alpha_mean.detach().cpu().numpy())
