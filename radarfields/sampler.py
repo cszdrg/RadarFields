@@ -121,8 +121,8 @@ def get_points(data_batch, args, device):
 
     # NOTE: we need to know the angular offset of each super-sampler ray for
     # weighted beam integration w/ antenna radiation profile
-    if args.integrate_rays:
-        points["angular_offsets"] = rays["fov_samples"] # [B, N*S, 3]
+    # if args.integrate_rays:
+    points["angular_offsets"] = rays["fov_samples"] # [B, N*S, 3]
 
     return points
 
