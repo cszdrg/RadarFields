@@ -81,6 +81,7 @@ def render_outputs_supersampled(trainer, data, points, bin_ranges, fig_path, tim
         # Convert each radar point to a (roll, pitch, yaw) vector
         norms = torch.norm(radar, dim=1, keepdim=True) # [R**2, 1]
         unit_radar = radar / norms # [R**2, 3]
+        unit_radar = torch.nan_to_num(unit_radar, nan=0.0)
         yaw = torch.atan2(unit_radar[:, 1], unit_radar[:, 0])
         pitch = torch.zeros_like(yaw)
         roll = torch.zeros_like(pitch)
