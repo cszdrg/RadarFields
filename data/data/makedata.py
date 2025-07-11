@@ -117,7 +117,7 @@ for frame_id, timestamp in frames:
     fft_np = (fft_img.cpu().numpy() * 255).astype(np.uint8)
     # ret, binary_mask = cv2.threshold(fft_np, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     ret , binary_mask = cv2.threshold(fft_np, 80, 255, cv2.THRESH_BINARY)
-    binary_mask = 1 - binary_mask / 255
+    binary_mask = binary_mask / 255
 
     # === Step 4: 保存二值数据 ===
     occupancy_path = os.path.join(occupancy_path, occname)

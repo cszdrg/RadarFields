@@ -13,6 +13,7 @@ output_path = "fft_binary.png"     # 输出二值化图像路径
 image = Image.open(input_path).convert("L")  # 转灰度模式（L: 0-255）
 to_tensor = transforms.ToTensor()  # 归一化到 [0,1]
 fft_img = to_tensor(image).squeeze(0)  # shape: [H, W]
+fft_img = fft_img[11:, :] # 去除前 11 行元数据
 
 # === Step 2: 处理 NaN、归一化 ===
 fft_img = torch.nan_to_num(fft_img, nan=0.0)
