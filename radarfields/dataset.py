@@ -96,7 +96,7 @@ class RadarDataset:
             self.occ_frames = []
             occ_path = self.project_root / 'preprocess_results' / 'occupancy_component' / str(self.preprocess_file).split('.')[0]
             for fft_frame in tqdm.tqdm(fft_frames, desc=f"Loading occupancy components"):
-                timestamp = str(fft_frame).split('.')[0] + '.npy'
+                timestamp = str(fft_frame) + '.npy'
                 occupancy_component = torch.tensor(np.load(occ_path / timestamp), dtype=torch.float32)
                 self.occ_frames.append(occupancy_component)
         

@@ -2,6 +2,8 @@ from scipy.spatial.transform import Rotation as R
 from torchvision import transforms
 import torch
 from pyproj import Proj, Transformer
+from pathlib import Path
+import shutil
 import numpy as np
 import json
 import os
@@ -89,13 +91,14 @@ for frame_id, timestamp in frames:
     filename = f"{frame_id:06d}.png"
     occname = str(timestamp)
     old_path = os.path.join(FFTPath, filename)
-    occupancy_path = "preprocess_results\\occupancy_component"
+    occupancy_path = "preprocess_results\\occupancy_component\\preprocess_results"
 
     #使用二值化生成occupancy   
     # === Step 1: 读取 FFT PNG 图像 ===
     image = Image.open(old_path).convert("L")  # 转灰度模式（L: 0-255）
     to_tensor = transforms.ToTensor()  # 归一化到 [0,1]
     fft_img = to_tensor(image).squeeze(0)  # shape: [H, W]
+    fft_img = fft_img.T  # 转置为 [W, H] 以匹配原始数据格式
 
     # === Step 2: 处理 NaN、归一化 ===
     fft_img = torch.nan_to_num(fft_img, nan=0.0)
